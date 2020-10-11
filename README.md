@@ -20,7 +20,7 @@ NodeJs와 VueJs를 이용해 웹서버를 띄우고
 
 ## 배포된 Deploy URL
 
-https://shlee0882.github.io/nodeJs-google-image-crawling/
+https://shlee0882.github.io/vuejs-nodejs-google-image-crawling/
 
 <br>
 
@@ -65,7 +65,7 @@ npm install --save gh-pages
 2. package.json에 추가하기
 
 ```
-"homepage": "https://shlee0882.github.io/nodeJs-google-image-crawling/"
+"homepage": "https://shlee0882.github.io/vuejs-nodejs-google-image-crawling/"
 
 
 "scripts": {
@@ -82,7 +82,7 @@ npm run deploy
 4. 배포된 URL 확인하기
 
 ```
-https://shlee0882.github.io/nodeJs-google-image-crawling/
+https://shlee0882.github.io/vuejs-nodejs-google-image-crawling/
 ```
 
 <br>
