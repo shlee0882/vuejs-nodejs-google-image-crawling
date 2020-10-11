@@ -1,0 +1,34 @@
+{
+  "name": "vuejs-nodejs-google-image-crawling",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://shlee0882.github.io/vuejs-nodejs-google-image-crawling/",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "axios": "^0.20.0",
+    "core-js": "^3.6.5",
+    "fs": "0.0.1-security",
+    "gh-pages": "^3.1.0",
+    "google-images": "^2.1.0",
+    "image-to-blob": "^0.2.0",
+    "jquery": "^3.5.1",
+    "jszip": "^3.5.0",
+    "jszip-utils": "^0.1.0",
+    "request": "^2.88.2",
+    "url": "^0.11.0",
+    "vue": "^2.6.11",
+    "vue-icon": "^2.1.2",
+    "vue-router": "^3.2.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "vue-template-compiler": "^2.6.11"
+  }
+}
