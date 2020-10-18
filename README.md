@@ -26,7 +26,9 @@ https://shlee0882.github.io/vuejs-nodejs-google-image-crawling/
 
 ## 설치방법 공유
 
-- TODO 추후 블로깅 예정...
+- Nodejs 환경에서 테스트 해보기 : https://shlee0882.tistory.com/284?category=903333
+
+- 프론트 연결해서 테스트 해보기 : https://shlee0882.tistory.com/285?category=903333
 
 <br>
 
@@ -38,13 +40,6 @@ https://shlee0882.github.io/vuejs-nodejs-google-image-crawling/
 - fs
 - google-images
 - jszip, jszip-utils
-
-
-<br>
-
-## 코드 설명 
-
-- TODO 추후 블로깅 예정...
 
 <br>
 
