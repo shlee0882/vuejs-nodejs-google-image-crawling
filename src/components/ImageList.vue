@@ -1,7 +1,10 @@
 <template>
   <div class="hello">
     <div><h3>입력한 키워드 : {{ keyWord }}</h3></div><br>
-    <div id="myProgress"><div id="myBar">0%</div></div><br>
+    <div id="myProgress">
+      <span id="mySpan" style="color: white;font-family: auto;"></span>
+      <div id="myBar">0%</div>
+    </div><br>
     <div><button @click="getImageList">GET 이미지 크롤링!!</button></div>
     <h3 id="imgTitle" style="text-align: left;"></h3>
     <div>
@@ -12,8 +15,7 @@
 </template>
 <script>
 
-import API_DATA from '@/API_DATA.js'
-
+import API_DATA from '@/API_DATA';
 const GoogleImages = require('google-images');
 let url = require('url');
 let request = require('request');
@@ -23,7 +25,8 @@ const axios = require('axios');
 var JSZip = require("jszip");
 var JSZipUtils = require("jszip-utils");
 
-const client = new GoogleImages(API_DATA.csdID(), API_DATA.apiKey());
+const client = new GoogleImages(csdID, apiKey);
+
 
 window.setImmediate = window.setTimeout;
 
@@ -39,11 +42,13 @@ export default {
   },
   data() {
     return {
+      tempImgList : [],
       imgList: [],
       pageStVal: 1,
       pageEndVal: 201,
       localWidth: "",
       clickOnce: false,
+      valCnt : 0,
     };
   },
   methods: {
@@ -68,41 +73,55 @@ export default {
     },
     searchFunc() {
         self.clickOnce = true;
-        client.search(this.keyWord,  {page: self.pageStVal, size: 'large'})
+        document.getElementById("mySpan").textContent = "현재 크롤링 진행률 : "+Math.floor(0.5*this.pageStVal)+"% 입니다.";
+        client.search(self.keyWord,  {page: self.pageStVal, size: 'large'})
             .then(images => {
-            images.forEach(img => {
-                let filePath = url.parse(img.url).pathname;
-                let newFilePath = filePath.replace(/[^a-zA-Z0-8\.]+/g, '_');
-                let pattern = /\.(jpg|png|gif)\b/; 
-                // 파일길이가 200 미만이고 이미지 파일인지 체크
-                if(newFilePath.length<200 && pattern.test(newFilePath)){
-                    $( "#imageList1" ).append( "<li>"+img.url+"</li>" );
-                    this.downloadImg(img.url, img.description);
-                };
-            });
-            this.compareTwoVal();
+            for(let cnt=0; cnt<images.length; cnt++){
+              let img = images[cnt];
+              self.valCnt = cnt;
+              let filePath = url.parse(img.url).pathname;
+              let newFilePath = filePath.replace(/[^a-zA-Z0-8\.]+/g, '_');
+              let pattern = /\.(jpg|jpeg|png|gif)\b/; 
+              // 파일길이가 200 미만이고 이미지 파일인지 체크
+              if(newFilePath.length<200 && pattern.test(newFilePath)){
+                  $( "#imageList1" ).append( "<li>"+img.url+"</li>" );
+                  let data = {"imgUrl" : img.url, "imgDescription" : img.description}
+                  self.tempImgList.push(data);
+              };
+            }
+            self.compareTwoVal();
         }).catch(error => {
-            console.log(">>>>>>>>>>>>>>>>>>>"+error);
-            console.log("모든 이미지를 수집했습니다.1");
-            this.make_zip();
-            return false;
+            console.log(error);
+            self.compareTwoVal()
         });
     },
     compareTwoVal(){
-        if(self.pageStVal<self.pageEndVal){
-            setTimeout(function() {
-                self.pageStVal += 10;
-                if(self.localWidth != "100"){
-                  self.progressBar();
-                }
-                console.log("pageStVal: >>>>>>>>"+self.pageStVal);
-                self.searchFunc(self.pageStVal,self.pageEndVal);
-            }, 500);
-        }else{
-            console.log("모든 이미지를 수집했습니다.2");
-            this.make_zip();
-            return;
+      if(self.pageStVal<self.pageEndVal){
+        self.pageStVal += 10;
+        console.log("pageStVal: >>>>>>>>"+self.pageStVal);
+        self.searchFunc(self.pageStVal,self.pageEndVal);
+      }else{
+          console.log("모든 이미지를 수집했습니다.2");
+          this.fetchSomeThing(0);
+          return;
+      }
+    },
+    fetchSomeThing(cnt) {
+      if(self.tempImgList[cnt] != null){
+        let img = self.tempImgList[cnt];
+        let tempList = self.tempImgList;
+        this.getBase64FromUrl(img.imgUrl, img.imgDescription).then(result=>{
+          cnt++;
+          if(cnt == tempList.length-1){
+            self.make_zip();
+          }else{
+            self.fetchSomeThing(cnt);   
+          }
+        });
+        if(self.localWidth != "100"){
+            self.progressBar(cnt);
         }
+      }
     },
     make_zip() {
       var zip = new JSZip();
@@ -112,46 +131,41 @@ export default {
           return self.make_zip();
         }, 500);
       }
-
+      
       if(self.imgList.length > 0){
         for(var i=0; i<self.imgList.length; i++){
           zip.file(self.imgList[i].description, this.urlToPromise(self.imgList[i].url), {binary:true});
         }
-
         zip.generateAsync({type:"blob"})
         .then(function(content) {
             saveAs(content, self.keyWord+".zip");
+            
         }, function(err){
             console.log(err)
         });
+        let elem = document.getElementById("myBar");
+        elem.style.width = "100%";
+        elem.innerHTML = "100%";
+        document.getElementById("mySpan").textContent = "이미지 파일로 변환완료";
         self.clickOnce = false;
       }else{
         return;
       }
     },
-
-    downloadImg(imgUrl, description) {
-      axios(
-        {
-            url: imgUrl,
-            responseType: 'blob',
-        }
-        ).then((response) => {
-              var blobData = new Blob([response.data]);
-              console.log(blobData);
-              var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-              var fileLink = document.createElement('a');
-
-              fileLink.href = fileURL;
-              fileLink.setAttribute('download', description+'.jpg');
-              document.body.appendChild(fileLink);
-              var jsonData = {"url":fileURL, "description":description+'.jpg'};
-              self.imgList.push(jsonData);
-              console.log(fileLink);
-              // fileLink.click();
-        });
+    getBase64FromUrl : async (imgUrl, description) => {
+      let calculImgUrl = myHerokuUrl + imgUrl;
+      const data = await fetch(calculImgUrl);
+      const blobData = await data.blob();
+      return new Promise((resolve) => {
+          var fileURL = window.URL.createObjectURL(new Blob([blobData]));
+          var fileLink = document.createElement('a');
+          fileLink.href = fileURL;
+          fileLink.setAttribute('download', description+'.jpg');
+          document.body.appendChild(fileLink);
+          var jsonData = {"url":fileURL, "description":description+'.jpg'};
+          resolve(self.imgList.push(jsonData));
+      });
     },
-
     urlToPromise(url) {
       return new Promise(function(resolve, reject) {
           JSZipUtils.getBinaryContent(url, function (err, data) {
@@ -163,16 +177,18 @@ export default {
           });
       });
     },
-
-    progressBar() {
+    progressBar(num) {
       var elem = document.getElementById("myBar");
-      self.localWidth = Math.floor(self.pageStVal / 2).toString();
-      if(Number(self.localWidth) >= 100){
+      self.localWidth = parseFloat((100 / self.tempImgList.length)).toFixed(1).toString();
+      let percentage = parseFloat(Number(self.localWidth)*Number(num)).toFixed(1)
+      if(percentage >= 100.0){
         elem.style.width = "100%";
         elem.innerHTML = "100%";
+        document.getElementById("mySpan").textContent = "이미지 파일로 변환완료";
       }else{
-        elem.style.width = self.localWidth + "%";
-        elem.innerHTML = self.localWidth + "%";
+        elem.style.width = percentage+"%";
+        elem.innerHTML = percentage+"%";
+        document.getElementById("mySpan").textContent = "이미지 파일로 변환 중: "+percentage+"% 입니다.";
       }
     }
   },
