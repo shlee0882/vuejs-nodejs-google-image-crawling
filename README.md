@@ -11,10 +11,8 @@ NodeJs와 VueJs를 이용해 웹서버를 띄우고
 - 검색하고 싶은 키워드를 입력합니다.
 - 키워드에 대한 이미지를 구글 검색엔진을 통해 받아옵니다.
 - 이미지를 모두 모은 결과값을 압축파일 zip로 받아옵니다.
-- 이미지는 최대 200개 까지 받아올 수 있습니다.
-- ⚠️**Chrome Extension**에서 🔴**Access-Control-Allow-Origin** 플러그인을 다운받아 사용하면 
-효율적으로 크롤링 할 수 있습니다.
-![확장프로그램](access-control.PNG)
+- 이미지는 최대 300개 까지 받아올 수 있습니다.
+- cross origin header 이슈 해결을 위해 heroku 서버를 거쳐 blob url을 받아옵니다. 
 
 <br>
 
