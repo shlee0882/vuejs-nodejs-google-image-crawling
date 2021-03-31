@@ -66,6 +66,9 @@ export default {
         this.pageEndVal = 201;
         $('#imageList1').empty();
         self.localWidth = "";
+        let elem = document.getElementById("myBar");
+        elem.style.width = "0%";
+        elem.innerHTML = "0%";
         self.searchFunc();
       }else{
         alert("크롤링 중입니다. 잠시만 기달려주세요.");
@@ -91,17 +94,14 @@ export default {
             }
             self.compareTwoVal();
         }).catch(error => {
-            console.log(error);
             self.compareTwoVal()
         });
     },
     compareTwoVal(){
       if(self.pageStVal<self.pageEndVal){
         self.pageStVal += 10;
-        console.log("pageStVal: >>>>>>>>"+self.pageStVal);
         self.searchFunc(self.pageStVal,self.pageEndVal);
       }else{
-          console.log("모든 이미지를 수집했습니다.2");
           this.fetchSomeThing(0);
           return;
       }
@@ -141,7 +141,6 @@ export default {
             saveAs(content, self.keyWord+".zip");
             
         }, function(err){
-            console.log(err)
         });
         let elem = document.getElementById("myBar");
         elem.style.width = "100%";
@@ -152,19 +151,35 @@ export default {
         return;
       }
     },
-    getBase64FromUrl : async (imgUrl, description) => {
-      let calculImgUrl = myHerokuUrl + imgUrl;
-      const data = await fetch(calculImgUrl);
-      const blobData = await data.blob();
-      return new Promise((resolve) => {
-          var fileURL = window.URL.createObjectURL(new Blob([blobData]));
-          var fileLink = document.createElement('a');
-          fileLink.href = fileURL;
-          fileLink.setAttribute('download', description+'.jpg');
-          document.body.appendChild(fileLink);
-          var jsonData = {"url":fileURL, "description":description+'.jpg'};
-          resolve(self.imgList.push(jsonData));
+    fetchWithTimeout : async(resource, options) => {
+      const { timeout = 5000 } = options;
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+      const response = await fetch(resource, {
+        ...options,
+        signal: controller.signal  
       });
+      clearTimeout(id);
+      return response;
+    },
+    getBase64FromUrl : async (imgUrl, description) => {
+      let result;
+      let calculImgUrl = myHerokuUrl + imgUrl;
+      try {
+        const data = await self.fetchWithTimeout(calculImgUrl, {timeout: 3000});
+        const blobData = await data.blob();
+        return new Promise((resolve) => {
+            var fileURL = window.URL.createObjectURL(new Blob([blobData]));
+            var fileLink = document.createElement('a');
+            fileLink.href = fileURL;
+            fileLink.setAttribute('download', description+'.jpg');
+            document.body.appendChild(fileLink);
+            var jsonData = {"url":fileURL, "description":description+'.jpg'};
+            resolve(self.imgList.push(jsonData));
+        });
+      } catch (error){
+        return result;
+      }
     },
     urlToPromise(url) {
       return new Promise(function(resolve, reject) {
