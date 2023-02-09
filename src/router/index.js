@@ -4,7 +4,7 @@ import Home from '../views/Home.vue';
 
 const routes = [
   {
-    path: '/',
+    path: '/vuejs-nodejs-google-image-crawling/',
     name: 'Home',
     component: Home,
   }
