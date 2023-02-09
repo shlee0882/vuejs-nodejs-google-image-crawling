@@ -45,7 +45,7 @@ export default {
       tempImgList : [],
       imgList: [],
       pageStVal: 1,
-      pageEndVal: 201,
+      pageEndVal: 51,
       localWidth: "",
       clickOnce: false,
       valCnt : 0,
@@ -63,7 +63,7 @@ export default {
       if(!this.clickOnce){
         this.imgList = [];
         this.pageStVal = 1;
-        this.pageEndVal = 201;
+        this.pageEndVal = 51;
         $('#imageList1').empty();
         self.localWidth = "";
         let elem = document.getElementById("myBar");
