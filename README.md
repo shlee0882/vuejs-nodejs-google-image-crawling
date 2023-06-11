@@ -16,6 +16,14 @@ NodeJs와 VueJs를 이용해 웹서버를 띄우고
 
 <br>
 
+## 기능 요약
+
+- 이미지 찾기 기능
+![이미지 찾기 기능1](/src/assets/gif/gif_img_1.gif)
+![이미지 찾기 기능2](/src/assets/gif/gif_img_2.gif)
+![압축된 파일 다운기능](/src/assets/gif/gif_img_3.gif)
+
+
 ## 배포된 Deploy URL
 
 https://shlee0882.github.io/vuejs-nodejs-google-image-crawling/
